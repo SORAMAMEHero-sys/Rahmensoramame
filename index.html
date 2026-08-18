@@ -252,15 +252,16 @@
     let state = { ...INITIAL_STATE };
     let gameLoopTimer = null;
 
-    // 現在の価格を計算する関数（1回買うごとに+2000円）
+    // 現在の価格を計算する関数
     function getPartTimePrice() {
         return 1000 + (state.partTime * 2000);
     }
     function getWaitressPrice() {
         return 2000 + (state.waitress * 2000);
     }
+    // YouTuberは1人買うごとに20,000円ずつ高くなるように変更
     function getYoutuberPrice() {
-        return 20000 + (state.youtuber * 2000);
+        return 20000 + (state.youtuber * 20000);
     }
 
     // セーブ処理
