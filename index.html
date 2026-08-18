@@ -183,9 +183,9 @@
 
     <div class="section">
         <div class="section-title">強化メニュー</div>
-        <button class="btn-upgrade" id="btnBuyPartTime">バイト (1,000円) - 売上1.3倍</button>
-        <button class="btn-upgrade" id="btnBuyWaitress">看板娘 (2,000円) - 回転率0.2秒短縮 [上限25]</button>
-        <button class="btn-upgrade" id="btnBuyYoutuber">YouTuber (20,000円) - 売上3倍</button>
+        <button class="btn-upgrade" id="btnBuyPartTime">バイト (<span id="partTimePrice">1,000</span>円) - 売上1.3倍</button>
+        <button class="btn-upgrade" id="btnBuyWaitress">看板娘 (<span id="waitressPrice">2,000</span>円) - 回転率0.2秒短縮 [上限25]</button>
+        <button class="btn-upgrade" id="btnBuyYoutuber">YouTuber (<span id="youtuberPrice">20,000</span>円) - 売上3倍</button>
     </div>
 
     <div class="section">
@@ -252,6 +252,17 @@
     let state = { ...INITIAL_STATE };
     let gameLoopTimer = null;
 
+    // 現在の価格を計算する関数（1回買うごとに+2000円）
+    function getPartTimePrice() {
+        return 1000 + (state.partTime * 2000);
+    }
+    function getWaitressPrice() {
+        return 2000 + (state.waitress * 2000);
+    }
+    function getYoutuberPrice() {
+        return 20000 + (state.youtuber * 2000);
+    }
+
     // セーブ処理
     function saveGame(showLog = false) {
         try {
@@ -309,6 +320,11 @@
         document.getElementById('waitressCount').innerText = state.waitress;
         document.getElementById('youtuberCount').innerText = state.youtuber;
 
+        // ボタンの表示価格を更新
+        document.getElementById('partTimePrice').innerText = getPartTimePrice().toLocaleString();
+        document.getElementById('waitressPrice').innerText = getWaitressPrice().toLocaleString();
+        document.getElementById('youtuberPrice').innerText = getYoutuberPrice().toLocaleString();
+
         document.getElementById('btnBuyWaitress').disabled = state.waitress >= 25;
     }
 
@@ -358,13 +374,14 @@
 
     // バイト購入処理
     function buyPartTime() {
-        if (state.money < 1000) {
+        const price = getPartTimePrice();
+        if (state.money < price) {
             log('所持金が足りません！');
             return;
         }
-        state.money -= 1000;
+        state.money -= price;
         state.partTime += 1;
-        log('バイトを1人雇いました (-1,000円)');
+        log(`バイトを1人雇いました (-${price.toLocaleString()}円)`);
         updateUI();
         if (!checkGameOver()) saveGame();
     }
@@ -375,13 +392,14 @@
             log('看板娘は25人が上限です！');
             return;
         }
-        if (state.money < 2000) {
+        const price = getWaitressPrice();
+        if (state.money < price) {
             log('所持金が足りません！');
             return;
         }
-        state.money -= 2000;
+        state.money -= price;
         state.waitress += 1;
-        log('看板娘を1人雇いました (-2,000円)');
+        log(`看板娘を1人雇いました (-${price.toLocaleString()}円)`);
         updateUI();
         restartCustomerTimer();
         if (!checkGameOver()) saveGame();
@@ -389,30 +407,30 @@
 
     // YouTuber購入処理
     function buyYoutuber() {
-        if (state.money < 20000) {
+        const price = getYoutuberPrice();
+        if (state.money < price) {
             log('所持金が足りません！');
             return;
         }
-        state.money -= 20000;
+        state.money -= price;
         state.youtuber += 1;
-        log('YouTuberを1人雇いました (-20,000円)');
+        log(`YouTuberを1人雇いました (-${price.toLocaleString()}円)`);
         updateUI();
         if (!checkGameOver()) saveGame();
     }
 
-    // 高速連打・長押し対応イベント登録関数（タッチの遅延やダブルタップブロックを回避）
+    // 高速連打・長押し対応イベント登録関数
     function setupRapidButton(elementId, actionFunc) {
         const btn = document.getElementById(elementId);
         let holdTimer = null;
         let isHolding = false;
+        let holdInterval = null;
 
-        // タップ/クリック開始
         const startAction = (e) => {
             e.preventDefault();
             if (btn.disabled) return;
             actionFunc();
 
-            // 押したままにした場合、少し待ってから連打（長押し連続購入）を発生させる
             isHolding = true;
             clearTimeout(holdTimer);
             holdTimer = setTimeout(() => {
@@ -423,12 +441,11 @@
                         } else {
                             actionFunc();
                         }
-                    }, 100); // 0.1秒ごとに連続購入
+                    }, 100);
                 }
-            }, 400); // 0.4秒長押しで自動連打スタート
+            }, 400);
         };
 
-        let holdInterval = null;
         const stopAction = () => {
             isHolding = false;
             clearTimeout(holdTimer);
