@@ -2,9 +2,24 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 1. Viewportによるズーム防止 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ラーメン屋経営ゲーム</title>
     <style>
+        /* 2. CSSによるタップ・ズーム・選択防止 */
+        * {
+            box-sizing: border-box;
+            /* ダブルタップズームの無効化と連打遅延の解消 */
+            touch-action: manipulation;
+            /* テキスト選択（長押しや連打時の青いハイライト）を防止 */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            /* スマホタップ時のグレー背景を透明化 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
             background-color: #f4f4f9;
@@ -12,7 +27,10 @@
             padding: 20px;
             display: flex;
             justify-content: center;
+            /* 画面全体のスクロールによるガタつきを軽減 */
+            overscroll-behavior: none;
         }
+
         .container {
             width: 100%;
             max-width: 500px;
@@ -21,11 +39,13 @@
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+
         h1 {
             text-align: center;
             color: #d32f2f;
             margin-top: 0;
         }
+
         .status-panel {
             background: #fff8e1;
             padding: 15px;
@@ -33,21 +53,25 @@
             margin-bottom: 20px;
             border: 1px solid #ffe082;
         }
+
         .status-item {
             font-size: 16px;
             margin: 8px 0;
             font-weight: bold;
             color: #333;
         }
+
         .staff-icons {
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px dashed #ffd54f;
             font-size: 15px;
         }
+
         .section {
             margin-bottom: 20px;
         }
+
         .section-title {
             font-weight: bold;
             font-size: 18px;
@@ -56,35 +80,47 @@
             border-left: 4px solid #d32f2f;
             padding-left: 8px;
         }
+
         button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin: 6px 0;
             font-size: 16px;
             font-weight: bold;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            transition: background 0.2s, opacity 0.2s;
+            transition: background 0.1s, opacity 0.2s;
         }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
         }
+
         .btn-buy {
             background-color: #ff9800;
             color: white;
         }
+
         .btn-buy:hover:not(:disabled) {
             background-color: #f57c00;
         }
+
         .btn-upgrade {
             background-color: #4caf50;
             color: white;
         }
+
         .btn-upgrade:hover:not(:disabled) {
             background-color: #388e3c;
         }
+
         .log-panel {
             background: #212121;
             color: #4caf50;
@@ -94,6 +130,8 @@
             overflow-y: auto;
             border-radius: 6px;
             font-size: 13px;
+            /* ログパネル内のみスクロールを許可 */
+            touch-action: pan-y;
         }
     </style>
 </head>
@@ -135,7 +173,48 @@
 </div>
 
 <script>
-    // 初期ゲーム状態
+    // -------------------------------------------------------------
+    // 3. JavaScriptによるズーム徹底ガード処理
+    // -------------------------------------------------------------
+    // iOS Safari等のピンチズーム防止
+    document.addEventListener('gesturestart', function (e) {
+        e.preventDefault();
+    }, { passive: false });
+
+    // Multi-touch（2本指タップ）による拡大防止
+    document.addEventListener('touchstart', function (e) {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // 連打（ダブルタップ）による拡大防止
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (e) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // PCでのCtrl + ホイールズーム防止
+    document.addEventListener('wheel', function (e) {
+        if (e.ctrlKey) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // PCでのCtrl + +/- キーによるズーム防止
+    document.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
+            e.preventDefault();
+        }
+    });
+
+    // -------------------------------------------------------------
+    // ゲームロジック
+    // -------------------------------------------------------------
     const INITIAL_STATE = {
         money: 1000,
         evaluation: 50,
@@ -202,7 +281,7 @@
         restartCustomerTimer();
     }
 
-    // ラーメン購入ボタンを押した処理
+    // ラーメン購入ボタン処理
     function buyRamen() {
         state.money -= 500;
         state.stock += 1;
@@ -257,13 +336,12 @@
 
     // 客の来店処理 (一定周期で自動生成)
     setInterval(() => {
-        // ランダムで1〜3人の客が来店
         const incoming = Math.floor(Math.random() * 3) + 1;
         state.customers += incoming;
         updateUI();
     }, 4000);
 
-    // 接客・販売ループ (回転率に応じて実行)
+    // 接客・販売ループ
     function processCustomer() {
         if (state.customers > 0) {
             state.customers -= 1;
@@ -287,7 +365,7 @@
         }
     }
 
-    // 看板娘の数に応じて回転率のタイマーを再設定
+    // 看板娘の数に応じてタイマーを再設定
     function restartCustomerTimer() {
         if (gameLoopTimer) clearInterval(gameLoopTimer);
         
