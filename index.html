@@ -1,609 +1,307 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>そらまめラーメン店経営</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      background-color: #fff3e0;
-      color: #3e2723;
-      padding-top: 10px;
-      touch-action: manipulation;
-      user-select: none;
-      -webkit-user-select: none;
-      overflow: hidden;
-      position: relative;
-      margin: 0;
-      height: 100vh;
-    }
-
-    /* 📊 ゲージ表示エリア */
-    .gauge-container {
-      width: 85%;
-      margin: 5px auto 8px auto;
-      background-color: #ffe0b2;
-      border-radius: 10px;
-      padding: 3px;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .gauge-bar {
-      height: 14px;
-      width: 0%;
-      background: linear-gradient(90deg, #ffb74d, #ff9800);
-      border-radius: 7px;
-      transition: width 0.3s ease-out;
-    }
-    .gauge-text {
-      font-size: 0.8rem;
-      font-weight: bold;
-      color: #e65100;
-      margin-top: 2px;
-    }
-
-    .score-board {
-      font-size: 1.3rem;
-      margin: 2px 0;
-      font-weight: bold;
-    }
-    .sub-score {
-      font-size: 0.9rem;
-      color: #d84315;
-      margin-bottom: 5px;
-    }
-
-    /* 🍜 お客さんエリア */
-    .customer-area {
-      background: #ffe0b2;
-      border-radius: 10px;
-      width: 90%;
-      margin: 5px auto;
-      padding: 8px;
-      font-size: 0.9rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    /* ゲームステージ */
-    .game-stage {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin: 5px 0;
-    }
-
-    .ramen-btn {
-      font-size: 4.5rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.03s;
-      -webkit-tap-highlight-color: transparent;
-      outline: none;
-      z-index: 10;
-    }
-    .ramen-btn:active {
-      transform: scale(0.85);
-    }
-
-    /* メニューボタン群 */
-    .menu-group {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 5px;
-    }
-    .action-btn {
-      font-size: 1rem;
-      font-weight: bold;
-      padding: 8px 16px;
-      background-color: #ff9800;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      box-shadow: 0 3px 5px rgba(0,0,0,0.2);
-    }
-    .action-btn:active { transform: scale(0.95); }
-
-    /* モーダル */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 200;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: white;
-      padding: 15px;
-      border-radius: 15px;
-      width: 85%;
-      max-width: 340px;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .modal-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #e65100;
-      margin-bottom: 3px;
-    }
-    .shop-btn {
-      font-size: 0.85rem;
-      padding: 8px;
-      background-color: #ffb74d;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .shop-btn:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-    .close-btn {
-      background-color: #888;
-      color: white;
-      border: none;
-      padding: 8px;
-      border-radius: 8px;
-      margin-top: 5px;
-      cursor: pointer;
-    }
-
-    .system-btn {
-      margin-top: 8px;
-      font-size: 0.75rem;
-      padding: 4px 8px;
-      background-color: #e0e0e0;
-      color: #666;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    /* 🎉 クリアモーダル */
-    .clear-modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      color: white;
-    }
-
-    /* ポップアニメーション */
-    .pop-number {
-      position: absolute;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #e65100;
-      pointer-events: none;
-      animation: popUp 0.6s ease-out forwards;
-      z-index: 100;
-    }
-    @keyframes popUp {
-      0% { opacity: 1; transform: translateY(0) scale(1); }
-      50% { opacity: 0.9; transform: translateY(-35px) scale(1.2); }
-      100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ラーメン屋経営ゲーム</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #d32f2f;
+            margin-top: 0;
+        }
+        .status-panel {
+            background: #fff8e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ffe082;
+        }
+        .status-item {
+            font-size: 16px;
+            margin: 8px 0;
+            font-weight: bold;
+            color: #333;
+        }
+        .staff-icons {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #ffd54f;
+            font-size: 15px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #444;
+            border-left: 4px solid #d32f2f;
+            padding-left: 8px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.2s;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-buy {
+            background-color: #ff9800;
+            color: white;
+        }
+        .btn-buy:hover:not(:disabled) {
+            background-color: #f57c00;
+        }
+        .btn-upgrade {
+            background-color: #4caf50;
+            color: white;
+        }
+        .btn-upgrade:hover:not(:disabled) {
+            background-color: #388e3c;
+        }
+        .log-panel {
+            background: #212121;
+            color: #4caf50;
+            font-family: monospace;
+            padding: 10px;
+            height: 120px;
+            overflow-y: auto;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="gauge-container">
-    <div class="gauge-bar" id="gauge-bar"></div>
-    <div class="gauge-text" id="gauge-text">クリアまであと 100,000,000 円</div>
-  </div>
+<div class="container">
+    <h1>🍜 ラーメン屋経営</h1>
 
-  <div class="score-board">
-    売上: <span id="money-count">100,000</span> 円
-  </div>
-  <div class="sub-score">
-    ⭐ 評価: <span id="rating-count">5.0</span> | 🔄 回転速度: <span id="speed-count">3.0</span>秒
-  </div>
-
-  <div class="customer-area" id="customer-area">
-    <div id="customer-msg">お客さんを待っています...</div>
-  </div>
-
-  <div class="game-stage">
-    <button id="tap-btn" class="ramen-btn">🍜</button>
-  </div>
-
-  <div class="menu-group">
-    <button id="open-shop-btn" class="action-btn">🛒 食材・麺・スープ購入</button>
-    <button id="open-menu-btn" class="action-btn" style="background-color: #4caf50;">📜 開発メニュー</button>
-  </div>
-
-  <div>
-    <button id="reset-btn" class="system-btn">データをリセットして最初から</button>
-  </div>
-
-  <div id="clear-modal" class="clear-modal">
-    <div style="font-size: 2rem; font-weight: bold; color: #ffd700; margin-bottom: 10px;">🎉 ラーメン王クリア！！ 🎉</div>
-    <div style="font-size: 1rem; margin-bottom: 20px; line-height: 1.5;">
-      売上100億円を達成しました！<br>
-      あなたは日本一のそらまめラーメン店主です！🍜👑
+    <div class="status-panel">
+        <div class="status-item">所持金（売上）: <span id="money">1,000</span> 円</div>
+        <div class="status-item">評価: <span id="eval">50</span> / 100</div>
+        <div class="status-item">在庫ラーメン: <span id="stock">0</span> 杯</div>
+        <div class="status-item">待ち客数: 👥 × <span id="customers">0</span></div>
+        <div class="status-item">回転速度: 1客 / <span id="speed">3.0</span> 秒</div>
+        
+        <div class="staff-icons">
+            🧑‍🔧×<span id="partTimeCount">0</span> 
+            🙋‍♀️×<span id="waitressCount">0</span> 
+            😎×<span id="youtuberCount">0</span>
+        </div>
     </div>
-    <button id="continue-btn" class="action-btn">そのまま遊ぶ</button>
-  </div>
 
-  <div id="shop-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-title">🛒 食材・麺・スープ購入</div>
-      <div style="font-size: 0.8rem; font-weight:bold; color:#d84315;">麺の在庫: <span id="noodle-stock">0</span>玉</div>
-      
-      <div style="font-weight:bold; font-size:0.9rem; margin-top:5px;">麺を補充（10玉購入）</div>
-      <button id="buy-noodle-box" class="shop-btn">中華麺セット (1000円)</button>
-
-      <div style="font-weight:bold; font-size:0.9rem; margin-top:5px;">麺の種類を購入</div>
-      <div id="noodle-shop-list" style="display:flex; flex-direction:column; gap:5px;"></div>
-
-      <div style="font-weight:bold; font-size:0.9rem; margin-top:5px;">スープの種類を購入</div>
-      <div id="soup-shop-list" style="display:flex; flex-direction:column; gap:5px;"></div>
-
-      <button id="close-shop-btn" class="close-btn">閉じる</button>
+    <div class="section">
+        <div class="section-title">仕入れ</div>
+        <button class="btn-buy" id="btnBuyRamen" onclick="buyRamen()">ラーメン購入 (500円)</button>
     </div>
-  </div>
 
-  <div id="menu-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-title">📜 ラーメン開発 ＆ 提供</div>
-      <div style="font-size: 0.8rem;">生み出した種類: <span id="unlocked-count">0</span> / 100</div>
-      
-      <div style="font-weight:bold; font-size:0.9rem; margin-top:5px;">新しいラーメンを開発する</div>
-      <div style="display: flex; gap: 5px;">
-        <select id="select-noodle" style="flex:1; font-size:0.8rem;"></select>
-        <select id="select-soup" style="flex:1; font-size:0.8rem;"></select>
-      </div>
-      <button id="develop-btn" class="action-btn" style="font-size:0.9rem; padding:6px; margin-top:5px;">新ラーメン開発！</button>
-
-      <div style="font-weight:bold; font-size:0.9rem; margin-top:10px;">お店で提供するラーメン選択（麺だけで作れます！）</div>
-      <select id="active-ramen-select" style="font-size:0.9rem; padding:5px;"></select>
-      <button id="set-active-btn" class="shop-btn" style="background-color:#4caf50;">このラーメンを提供メニューに設定</button>
-
-      <button id="close-menu-btn" class="close-btn">閉じる</button>
+    <div class="section">
+        <div class="section-title">強化メニュー</div>
+        <button class="btn-upgrade" id="btnBuyPartTime" onclick="buyPartTime()">バイト (1,000円) - 売上1.3倍</button>
+        <button class="btn-upgrade" id="btnBuyWaitress" onclick="buyWaitress()">看板娘 (2,000円) - 回転率0.2秒短縮 [上限10]</button>
+        <button class="btn-upgrade" id="btnBuyYoutuber" onclick="buyYoutuber()">YouTuber (20,000円) - 売上3倍</button>
     </div>
-  </div>
 
-  <script>
-    const GOAL_MONEY = 10000000000; // 100億円
-    let money = 100000; // 初期10万円
-    let rating = 5.0;
-    let customerSpeed = 3.0; // 秒
-    let noodleStock = 20;
-    let isCleared = false;
+    <div class="section">
+        <div class="section-title">運営ログ</div>
+        <div class="log-panel" id="log"></div>
+    </div>
+</div>
 
-    // 定義データ
-    const noodles = [
-      { id: 'chuka', name: '中華麺', cost: 100, unlocked: true },
-      { id: 'hakata', name: '博多麺', cost: 300, unlocked: false },
-      { id: 'mame', name: '豆麺', cost: 800, unlocked: false },
-      { id: 'daizu', name: '大豆麺', cost: 2000, unlocked: false },
-      { id: 'somen', name: 'そうめん', cost: 5000, unlocked: false },
-      { id: 'udon', name: 'うどん', cost: 15000, unlocked: false },
-      { id: 'soba', name: 'そば', cost: 40000, unlocked: false },
-      { id: 'mixn', name: 'ミックス麺', cost: 100000, unlocked: false },
-    ];
+<script>
+    // 初期ゲーム状態
+    const INITIAL_STATE = {
+        money: 1000,
+        evaluation: 50,
+        stock: 0,
+        customers: 0,
+        partTime: 0,
+        waitress: 0,
+        youtuber: 0,
+        basePrice: 1050,
+        baseSpeed: 3.0
+    };
 
-    const soups = [
-      { id: 'tonkotsu', name: '豚骨スープ', cost: 100, unlocked: true },
-      { id: 'shoyu', name: '醤油スープ', cost: 200, unlocked: false },
-      { id: 'miso', name: '味噌スープ', cost: 600, unlocked: false },
-      { id: 'mameton', name: '豆豚骨スープ', cost: 1500, unlocked: false },
-      { id: 'mameshoyu', name: '豆醤油スープ', cost: 4000, unlocked: false },
-      { id: 'mamemiso', name: '豆味噌スープ', cost: 10000, unlocked: false },
-      { id: 'mixs', name: 'みっくすーぷ', cost: 30000, unlocked: false },
-    ];
+    let state = { ...INITIAL_STATE };
+    let gameLoopTimer = null;
 
-    // 発見済みレシピ [{noodleId, soupId, name, price}]
-    let unlockedRecipes = [
-      { noodleId: 'chuka', soupId: 'tonkotsu', name: '中華麺 × 豚骨スープ', price: 500 }
-    ];
-    let currentRecipeIndex = 0;
+    // UI更新関数
+    function updateUI() {
+        document.getElementById('money').innerText = state.money.toLocaleString();
+        document.getElementById('eval').innerText = state.evaluation;
+        document.getElementById('stock').innerText = state.stock;
+        document.getElementById('customers').innerText = state.customers;
+        
+        const currentSpeed = Math.max(0.2, state.baseSpeed - (state.waitress * 0.2)).toFixed(1);
+        document.getElementById('speed').innerText = currentSpeed;
 
-    // 現在の顧客の好み
-    let currentCustomer = { noodleId: 'chuka', soupId: 'tonkotsu', name: '中華麺 × 豚骨スープ' };
+        document.getElementById('partTimeCount').innerText = state.partTime;
+        document.getElementById('waitressCount').innerText = state.waitress;
+        document.getElementById('youtuberCount').innerText = state.youtuber;
 
-    // DOM
-    const moneyCountEl = document.getElementById('money-count');
-    const ratingCountEl = document.getElementById('rating-count');
-    const speedCountEl = document.getElementById('speed-count');
-    const gaugeBar = document.getElementById('gauge-bar');
-    const gaugeText = document.getElementById('gauge-text');
-    const noodleStockEl = document.getElementById('noodle-stock');
-    const customerMsgEl = document.getElementById('customer-msg');
-    
-    const tapBtn = document.getElementById('tap-btn');
-    const openShopBtn = document.getElementById('open-shop-btn');
-    const openMenuBtn = document.getElementById('open-menu-btn');
-    const closeShopBtn = document.getElementById('close-shop-btn');
-    const closeMenuBtn = document.getElementById('close-menu-btn');
-    const shopModal = document.getElementById('shop-modal');
-    const menuModal = document.getElementById('menu-modal');
-    const clearModal = document.getElementById('clear-modal');
-    const continueBtn = document.getElementById('continue-btn');
-
-    const noodleShopList = document.getElementById('noodle-shop-list');
-    const soupShopList = document.getElementById('soup-shop-list');
-    const selectNoodle = document.getElementById('select-noodle');
-    const selectSoup = document.getElementById('select-soup');
-    const developBtn = document.getElementById('develop-btn');
-    const activeRamenSelect = document.getElementById('active-ramen-select');
-    const setActiveBtn = document.getElementById('set-active-btn');
-    const unlockedCountEl = document.getElementById('unlocked-count');
-    const resetBtn = document.getElementById('reset-btn');
-
-    // セーブ・ロード機能（絶対保持）
-    function saveGame() {
-      const data = {
-        money, rating, noodleStock, unlockedRecipes, currentRecipeIndex,
-        noodles: noodles.map(n => n.unlocked),
-        soups: soups.map(s => s.unlocked),
-        isCleared
-      };
-      localStorage.setItem('soramame_ramen_save', JSON.stringify(data));
+        // ボタンの活性/非活性制御
+        document.getElementById('btnBuyWaitress').disabled = state.waitress >= 10;
     }
 
-    function loadGame() {
-      const saved = localStorage.getItem('soramame_ramen_save');
-      if (saved) {
-        const data = JSON.parse(saved);
-        money = data.money !== undefined ? data.money : 100000;
-        rating = data.rating || 5.0;
-        noodleStock = data.noodleStock !== undefined ? data.noodleStock : 20;
-        unlockedRecipes = data.unlockedRecipes || unlockedRecipes;
-        currentRecipeIndex = data.currentRecipeIndex || 0;
-        isCleared = data.isCleared || false;
-        if (data.noodles) noodles.forEach((n, i) => n.unlocked = data.noodles[i]);
-        if (data.soups) soups.forEach((s, i) => s.unlocked = data.soups[i]);
-      }
+    // ログ出力関数
+    function log(message) {
+        const logPanel = document.getElementById('log');
+        const entry = document.createElement('div');
+        entry.innerText = `> ${message}`;
+        logPanel.appendChild(entry);
+        logPanel.scrollTop = logPanel.scrollHeight;
     }
 
-    function checkClear() {
-      if (money >= GOAL_MONEY && !isCleared) {
-        isCleared = true;
-        clearModal.style.display = 'flex';
-        saveGame();
-      }
+    // ゲームオーバー判定
+    function checkGameOver() {
+        if (state.money < 0) {
+            alert('所持金がマイナスになりました。ゲームオーバー！最初からやり直します。');
+            resetGame();
+            return true;
+        }
+        if (state.evaluation <= 0) {
+            alert('評価が0になりました。ゲームオーバー！最初からやり直します。');
+            resetGame();
+            return true;
+        }
+        return false;
     }
 
-    function updateDisplay() {
-      moneyCountEl.textContent = money.toLocaleString();
-      ratingCountEl.textContent = rating.toFixed(1);
-      speedCountEl.textContent = customerSpeed.toFixed(1);
-      noodleStockEl.textContent = noodleStock;
-      unlockedCountEl.textContent = unlockedRecipes.length;
-
-      // ゲージ更新
-      const percent = Math.min(100, (money / GOAL_MONEY) * 100);
-      gaugeBar.style.width = `${percent}%`;
-      const rem = Math.max(0, GOAL_MONEY - money);
-      if (rem === 0) {
-        gaugeText.textContent = "🎉 100億円達成！ラーメン王！！";
-      } else {
-        gaugeText.textContent = `クリアまであと ${rem.toLocaleString()} 円`;
-      }
-
-      checkClear();
-      renderShop();
-      renderMenuOptions();
+    // ゲームリセット
+    function resetGame() {
+        state = { ...INITIAL_STATE };
+        document.getElementById('log').innerHTML = '';
+        log('ゲームをリセットしました。');
+        updateUI();
+        restartCustomerTimer();
     }
 
-    function createPopNumber(e, text) {
-      const pop = document.createElement('div');
-      pop.className = 'pop-number';
-      pop.textContent = text;
-      const x = e ? e.clientX : window.innerWidth / 2;
-      const y = e ? e.clientY : window.innerHeight / 2;
-      pop.style.left = `${x - 20}px`;
-      pop.style.top = `${y - 30}px`;
-      document.body.appendChild(pop);
-      setTimeout(() => pop.remove(), 600);
+    // ラーメン購入ボタンを押した処理
+    function buyRamen() {
+        state.money -= 500;
+        state.stock += 1;
+        log('ラーメンを1食購入しました (-500円)');
+        updateUI();
+        checkGameOver();
     }
 
-    // タップでお金稼ぎ
-    tapBtn.addEventListener('click', (e) => {
-      money += 50;
-      createPopNumber(e, '+50円');
-      updateDisplay();
-      saveGame();
-    });
+    // バイト購入処理
+    function buyPartTime() {
+        if (state.money < 1000) {
+            log('所持金が足りません！');
+            return;
+        }
+        state.money -= 1000;
+        state.partTime += 1;
+        log('バイトを1人雇いました (-1,000円)');
+        updateUI();
+        checkGameOver();
+    }
 
-    // ショップ描画
-    function renderShop() {
-      noodleShopList.innerHTML = '';
-      noodles.forEach(n => {
-        if (!n.unlocked) {
-          const btn = document.createElement('button');
-          btn.className = 'shop-btn';
-          btn.textContent = `${n.name} を購入 (コスト: ${n.cost.toLocaleString()}円)`;
-          btn.disabled = money < n.cost;
-          btn.onclick = () => {
-            if (money >= n.cost) {
-              money -= n.cost;
-              n.unlocked = true;
-              updateDisplay();
-              saveGame();
+    // 看板娘購入処理
+    function buyWaitress() {
+        if (state.waitress >= 10) {
+            log('看板娘は10人が上限です！');
+            return;
+        }
+        if (state.money < 2000) {
+            log('所持金が足りません！');
+            return;
+        }
+        state.money -= 2000;
+        state.waitress += 1;
+        log('看板娘を1人雇いました (-2,000円)');
+        updateUI();
+        restartCustomerTimer();
+        checkGameOver();
+    }
+
+    // YouTuber購入処理
+    function buyYoutuber() {
+        if (state.money < 20000) {
+            log('所持金が足りません！');
+            return;
+        }
+        state.money -= 20000;
+        state.youtuber += 1;
+        log('YouTuberを1人雇いました (-20,000円)');
+        updateUI();
+        checkGameOver();
+    }
+
+    // 客の来店処理 (一定周期で自動生成)
+    setInterval(() => {
+        // ランダムで1〜3人の客が来店
+        const incoming = Math.floor(Math.random() * 3) + 1;
+        state.customers += incoming;
+        updateUI();
+    }, 4000);
+
+    // 接客・販売ループ (回転率に応じて実行)
+    function processCustomer() {
+        if (state.customers > 0) {
+            state.customers -= 1;
+
+            if (state.stock > 0) {
+                state.stock -= 1;
+                
+                // 売上計算: 基本(1050) × (1.3 ^ バイト数) × (3 ^ YouTuber数)
+                let earnings = state.basePrice * Math.pow(1.3, state.partTime) * Math.pow(3, state.youtuber);
+                earnings = Math.floor(earnings);
+                
+                state.money += earnings;
+                log(`ラーメンが売れました！ (+${earnings.toLocaleString()}円)`);
+            } else {
+                // 在庫切れの場合は評価ダウン
+                state.evaluation -= 5;
+                log('ラーメンの在庫がありません！ 評価が下がり(-5)');
             }
-          };
-          noodleShopList.appendChild(btn);
+            updateUI();
+            checkGameOver();
         }
-      });
-
-      soupShopList.innerHTML = '';
-      soups.forEach(s => {
-        if (!s.unlocked) {
-          const btn = document.createElement('button');
-          btn.className = 'shop-btn';
-          btn.textContent = `${s.name} を購入 (コスト: ${s.cost.toLocaleString()}円)`;
-          btn.disabled = money < s.cost;
-          btn.onclick = () => {
-            if (money >= s.cost) {
-              money -= s.cost;
-              s.unlocked = true;
-              updateDisplay();
-              saveGame();
-            }
-          };
-          soupShopList.appendChild(btn);
-        }
-      });
     }
 
-    // 麺補充ボタン
-    document.getElementById('buy-noodle-box').onclick = () => {
-      const cost = 1000;
-      if (money >= cost) {
-        money -= cost;
-        noodleStock += 10;
-        updateDisplay();
-        saveGame();
-      }
-    };
-
-    function renderMenuOptions() {
-      // 開発用セレクトボックス
-      selectNoodle.innerHTML = '';
-      noodles.filter(n => n.unlocked).forEach(n => {
-        const opt = document.createElement('option');
-        opt.value = n.id; opt.textContent = n.name;
-        selectNoodle.appendChild(opt);
-      });
-
-      selectSoup.innerHTML = '';
-      soups.filter(s => s.unlocked).forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.id; opt.textContent = s.name;
-        selectSoup.appendChild(opt);
-      });
-
-      // 提供用セレクトボックス
-      activeRamenSelect.innerHTML = '';
-      unlockedRecipes.forEach((r, idx) => {
-        const opt = document.createElement('option');
-        opt.value = idx; opt.textContent = `${r.name} (売値: ${r.price.toLocaleString()}円)`;
-        if (idx === currentRecipeIndex) opt.selected = true;
-        activeRamenSelect.appendChild(opt);
-      });
+    // 看板娘の数に応じて回転率のタイマーを再設定
+    function restartCustomerTimer() {
+        if (gameLoopTimer) clearInterval(gameLoopTimer);
+        
+        const currentSpeedSeconds = Math.max(0.2, state.baseSpeed - (state.waitress * 0.2));
+        const intervalMs = currentSpeedSeconds * 1000;
+        
+        gameLoopTimer = setInterval(processCustomer, intervalMs);
     }
 
-    // 新ラーメン開発
-    developBtn.onclick = () => {
-      const nId = selectNoodle.value;
-      const sId = selectSoup.value;
-      const nObj = noodles.find(x => x.id === nId);
-      const sObj = soups.find(x => x.id === sId);
+    // 初期化実行
+    updateUI();
+    restartCustomerTimer();
+    log('お店を開店しました！');
+</script>
 
-      // 既に存在するかチェック
-      const exists = unlockedRecipes.some(r => r.noodleId === nId && r.soupId === sId);
-      if (exists) {
-        alert('その組み合わせのラーメンはすでに開発済みです！');
-        return;
-      }
-
-      const devCost = (nObj.cost + sObj.cost) * 2;
-      if (money >= devCost) {
-        money -= devCost;
-        const price = Math.floor((nObj.cost + sObj.cost) * 4);
-        unlockedRecipes.push({ noodleId: nId, soupId: sId, name: `${nObj.name} × ${sObj.name}`, price });
-        alert(`新しいラーメン「${nObj.name} × ${sObj.name}」を開発しました！`);
-        updateDisplay();
-        saveGame();
-      } else {
-        alert('開発資金が足りません！');
-      }
-    };
-
-    setActiveBtn.onclick = () => {
-      currentRecipeIndex = parseInt(activeRamenSelect.value);
-      alert(`提供メニューを「${unlockedRecipes[currentRecipeIndex].name}」に変更しました！`);
-      menuModal.style.display = 'none';
-      saveGame();
-    };
-
-    openShopBtn.onclick = () => { shopModal.style.display = 'flex'; };
-    closeShopBtn.onclick = () => { shopModal.style.display = 'none'; };
-    openMenuBtn.onclick = () => { menuModal.style.display = 'flex'; };
-    closeMenuBtn.onclick = () => { menuModal.style.display = 'none'; };
-    continueBtn.onclick = () => { clearModal.style.display = 'none'; };
-
-    resetBtn.onclick = () => {
-      if (confirm('本当にリセットしますか？')) {
-        localStorage.removeItem('soramame_ramen_save');
-        money = 100000; rating = 5.0; customerSpeed = 3.0; noodleStock = 20;
-        noodles.forEach((n, i) => n.unlocked = (i === 0));
-        soups.forEach((s, i) => s.unlocked = (i === 0));
-        unlockedRecipes = [{ noodleId: 'chuka', soupId: 'tonkotsu', name: '中華麺 × 豚骨スープ', price: 500 }];
-        currentRecipeIndex = 0; isCleared = false;
-        updateDisplay();
-      }
-    };
-
-    // 新しいお客さんの好みをランダム生成
-    function rollNewCustomer() {
-      const randN = noodles.filter(n => n.unlocked)[Math.floor(Math.random() * noodles.filter(n => n.unlocked).length)];
-      const randS = soups.filter(s => s.unlocked)[Math.floor(Math.random() * soups.filter(s => s.unlocked).length)];
-      currentCustomer = { noodleId: randN.id, soupId: randS.id, name: `${randN.name} ＆ ${randS.name}スープ` };
-      customerMsgEl.innerHTML = `客「おっ、今日の気分は <b>${currentCustomer.name}</b> だな！」`;
-    }
-
-    // 顧客の自動来店・提供ループ
-    function customerLoop() {
-      setTimeout(() => {
-        if (noodleStock > 0) {
-          // 麺が十分にある場合
-          noodleStock -= 1;
-          const served = unlockedRecipes[currentRecipeIndex];
-          let earn = served.price;
-
-          // 好みが一致したらボーナス！
-          if (served.noodleId === currentCustomer.noodleId && served.soupId === currentCustomer.soupId) {
-            earn = Math.floor(earn * 2);
-            customerMsgEl.innerHTML = `大満足！「これだよこれ！最高！」 (+${earn.toLocaleString()}円)`;
-          } else {
-            customerMsgEl.innerHTML = `完食！「ふむ、美味しかったよ」 (+${earn.toLocaleString()}円)`;
-          }
-
-          money += earn;
-          // 評価が少し回復
-          if (rating < 5.0) rating = Math.min(5.0, rating + 0.05);
-          customerSpeed = Math.max(1.0, 3.0 - (rating - 1) * 0.2);
-
-          rollNewCustomer();
-        } else {
-          // 麺切れ！
-          customerMsgEl.innerHTML = `⚠️ <span style="color:red;">麺切れでお客さんを待たせている！</span>`;
-          rating = Math.max(1.0, rating - 0.2);
-          customerSpeed = Math.max(0.8, 3.0 - (rating - 1) * 0.2);
-        }
-
-        updateDisplay();
-        saveGame();
-        customerLoop();
-      }, customerSpeed * 1000);
-    }
-
-    loadGame();
-    updateDisplay();
-    rollNewCustomer();
-    customerLoop();
-  </script>
 </body>
 </html>
